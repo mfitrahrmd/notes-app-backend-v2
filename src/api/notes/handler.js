@@ -1,6 +1,9 @@
+const ClientError = require('../../exeptions/ClientError');
+
 class NotesHandler {
-  constructor(service) {
+  constructor(service, validator) {
     this._service = service;
+    this._validator = validator;
 
     this.postNoteHandler = this.postNoteHandler.bind(this);
     this.getNotesHandler = this.getNotesHandler.bind(this);
@@ -11,6 +14,7 @@ class NotesHandler {
 
   postNoteHandler(request, h) {
     try {
+      this._validator.validateNotePayload(request.payload);
       const { title = 'untitled', body, tags } = request.payload;
       const noteId = this._service.addNote({ title, body, tags });
 
@@ -24,12 +28,23 @@ class NotesHandler {
         })
         .code(201);
     } catch (error) {
+      if (error instanceof ClientError) {
+        return h
+          .response({
+            status: 'fail',
+            message: error.message,
+          })
+          .code(error.statusCode);
+      }
+
+      // Server ERROR
+      console.error(error);
       return h
         .response({
-          status: 'fail',
-          message: error.message,
+          status: 'error',
+          message: 'Maaf, terjadi kegagalan pada server kami.',
         })
-        .code(400);
+        .code(500);
     }
   }
 
@@ -60,17 +75,29 @@ class NotesHandler {
         })
         .code(200);
     } catch (error) {
+      if (error instanceof ClientError) {
+        return h
+          .response({
+            status: 'fail',
+            message: error.message,
+          })
+          .code(error.statusCode);
+      }
+
+      // Server ERROR
+      console.error(error);
       return h
         .response({
-          status: 'fail',
-          message: error.message,
+          status: 'error',
+          message: 'Maaf, terjadi kegagalan pada server kami.',
         })
-        .code(404);
+        .code(500);
     }
   }
 
   putNoteByIdHandler(request, h) {
     try {
+      this._validator.validateNotePayload(request.payload);
       const { id } = request.params;
       const { title, body, tags } = request.payload;
 
@@ -83,12 +110,23 @@ class NotesHandler {
         })
         .code(200);
     } catch (error) {
+      if (error instanceof ClientError) {
+        return h
+          .response({
+            status: 'fail',
+            message: error.message,
+          })
+          .code(error.statusCode);
+      }
+
+      // Server ERROR
+      console.error(error);
       return h
         .response({
-          status: 'fail',
-          message: error.message,
+          status: 'error',
+          message: 'Maaf, terjadi kegagalan pada server kami.',
         })
-        .code(404);
+        .code(500);
     }
   }
 
@@ -105,12 +143,23 @@ class NotesHandler {
         })
         .code(200);
     } catch (error) {
+      if (error instanceof ClientError) {
+        return h
+          .response({
+            status: 'fail',
+            message: error.message,
+          })
+          .code(error.statusCode);
+      }
+
+      // Server ERROR
+      console.error(error);
       return h
         .response({
-          status: 'fail',
-          message: error.message,
+          status: 'error',
+          message: 'Maaf, terjadi kegagalan pada server kami.',
         })
-        .code(404);
+        .code(500);
     }
   }
 }
