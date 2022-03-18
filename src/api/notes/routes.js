@@ -1,8 +1,25 @@
+const { NotePayloadSchema } = require('../../validator/notes/schema');
+const InvariantError = require('../../exeptions/InvariantError');
+
 const routes = (handler) => [
   {
     method: 'POST',
     path: '/notes',
     handler: handler.postNoteHandler,
+    config: {
+      validate: {
+        payload: NotePayloadSchema,
+        options: {
+          abortEarly: false,
+        },
+        failAction(request, h, err) {
+          if (err.isJoi) {
+            throw new InvariantError(err.message);
+          }
+          return h.continue;
+        },
+      },
+    },
   },
   {
     method: 'GET',
@@ -18,6 +35,20 @@ const routes = (handler) => [
     method: 'PUT',
     path: '/notes/{id}',
     handler: handler.putNoteByIdHandler,
+    config: {
+      validate: {
+        payload: NotePayloadSchema,
+        options: {
+          abortEarly: false,
+        },
+        failAction: (request, h, err) => {
+          if (err.isJoi) {
+            throw new InvariantError(err.message);
+          }
+          return h.continue;
+        },
+      },
+    },
   },
   {
     method: 'DELETE',
