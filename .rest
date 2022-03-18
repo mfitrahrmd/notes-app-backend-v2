@@ -10,3 +10,8 @@ Content-Type: application/json
 ###
 
 GET http://localhost:5000/users/user-QUxuo-xZrAyYqsyF HTTP/1.1
+
+###
+
+GET http://localhost:5000/notes HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItRkRjX0UxWTA5Z0dPc2RJcCIsImlhdCI6MTY0NzYxOTQxMn0.yoAwclhx2uMkVAJpmGNRKIpYoV1Z1b5DbJy-s24gbts
