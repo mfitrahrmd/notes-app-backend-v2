@@ -1,14 +1,30 @@
-const { NotePayloadSchema } = require('./schema');
+const { PostNotePayloadSchema, PutNotePayloadSchema } = require('./schema');
 const InvariantError = require('../../exeptions/InvariantError');
 
-const NotesValidator = {
-  validateNotePayload: (payload) => {
-    const validationResult = NotePayloadSchema.validate(payload);
-
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message);
+const postNoteValidator = {
+  payload: PostNotePayloadSchema,
+  options: {
+    abortEarly: false,
+  },
+  failAction(request, h, err) {
+    if (err.isJoi) {
+      throw new InvariantError(err.message);
     }
+    return h.continue;
   },
 };
 
-module.exports = NotesValidator;
+const putNoteValidator = {
+  payload: PutNotePayloadSchema,
+  options: {
+    abortEarly: false,
+  },
+  failAction(request, h, err) {
+    if (err.isJoi) {
+      throw new InvariantError(err.message);
+    }
+    return h.continue;
+  },
+};
+
+module.exports = { postNoteValidator, putNoteValidator };

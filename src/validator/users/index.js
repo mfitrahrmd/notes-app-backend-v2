@@ -1,14 +1,17 @@
-const { UserPayloadSchema } = require('./schema');
+const { PostUserPayloadSchema } = require('./schema');
 const InvariantError = require('../../exeptions/InvariantError');
 
-const UsersValidator = {
-  validateUsersPayload: (payload) => {
-    const validationResult = UserPayloadSchema.validate(payload);
-
-    if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message);
+const postUserValidator = {
+  payload: PostUserPayloadSchema,
+  options: {
+    abortEarly: false,
+  },
+  failAction(request, h, err) {
+    if (err.isJoi) {
+      throw new InvariantError(err.message);
     }
+    return h.continue;
   },
 };
 
-module.exports = UsersValidator;
+module.exports = { postUserValidator };

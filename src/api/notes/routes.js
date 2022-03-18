@@ -1,5 +1,4 @@
-const { NotePayloadSchema } = require('../../validator/notes/schema');
-const InvariantError = require('../../exeptions/InvariantError');
+const { postNoteValidator, putNoteValidator } = require('../../validator/notes');
 
 const routes = (handler) => [
   {
@@ -7,53 +6,42 @@ const routes = (handler) => [
     path: '/notes',
     handler: handler.postNoteHandler,
     config: {
-      validate: {
-        payload: NotePayloadSchema,
-        options: {
-          abortEarly: false,
-        },
-        failAction(request, h, err) {
-          if (err.isJoi) {
-            throw new InvariantError(err.message);
-          }
-          return h.continue;
-        },
-      },
+      auth: 'notesapp_jwt',
+      validate: postNoteValidator,
     },
   },
   {
     method: 'GET',
     path: '/notes',
     handler: handler.getNotesHandler,
+    config: {
+      auth: 'notesapp_jwt',
+    },
   },
   {
     method: 'GET',
     path: '/notes/{id}',
     handler: handler.getNoteByIdHandler,
+    config: {
+      auth: 'notesapp_jwt',
+    },
   },
   {
     method: 'PUT',
     path: '/notes/{id}',
     handler: handler.putNoteByIdHandler,
     config: {
-      validate: {
-        payload: NotePayloadSchema,
-        options: {
-          abortEarly: false,
-        },
-        failAction: (request, h, err) => {
-          if (err.isJoi) {
-            throw new InvariantError(err.message);
-          }
-          return h.continue;
-        },
-      },
+      auth: 'notesapp_jwt',
+      validate: putNoteValidator,
     },
   },
   {
     method: 'DELETE',
     path: '/notes/{id}',
     handler: handler.deleteNoteByIdHandler,
+    config: {
+      auth: 'notesapp_jwt',
+    },
   },
 ];
 

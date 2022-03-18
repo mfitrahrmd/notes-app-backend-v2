@@ -1,5 +1,4 @@
-const { UserPayloadSchema } = require('../../validator/users/schema');
-const InvariantError = require('../../exeptions/InvariantError');
+const { postUserValidator } = require('../../validator/users');
 
 const routes = (handler) => [
   {
@@ -7,18 +6,7 @@ const routes = (handler) => [
     method: 'POST',
     handler: handler.postUserHandler,
     config: {
-      validate: {
-        payload: UserPayloadSchema,
-        options: {
-          abortEarly: false,
-        },
-        failAction(request, h, err) {
-          if (err.isJoi) {
-            throw new InvariantError(err.message);
-          }
-          return h.continue;
-        },
-      },
+      validate: postUserValidator,
     },
   },
   {
