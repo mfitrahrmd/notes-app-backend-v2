@@ -10,10 +10,9 @@ class NotesHandler {
   }
 
   async postNoteHandler(request, h) {
-    const { title = 'untitled', body, tags } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
-    const noteId = await this._service.addNote({ title, body, tags, credentialId });
+    const noteId = await this._service.addNote({ ...request.payload, credentialId });
 
     return h
       .response({
@@ -45,7 +44,7 @@ class NotesHandler {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._service.verifyNoteOwner(id, credentialId);
+    await this._service.verifyNoteAccess(id, credentialId);
 
     const note = await this._service.getNoteById(id);
 
@@ -61,12 +60,11 @@ class NotesHandler {
 
   async putNoteByIdHandler(request, h) {
     const { id } = request.params;
-    const { title, body, tags } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._service.verifyNoteOwner(id, credentialId);
+    await this._service.verifyNoteAccess(id, credentialId);
 
-    await this._service.editNoteById(id, { title, body, tags });
+    await this._service.editNoteById(id, request.payload);
 
     return h
       .response({

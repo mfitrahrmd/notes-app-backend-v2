@@ -2,16 +2,45 @@ POST http://localhost:5000/users HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "ggwp",
-  "password": "ggwp",
-  "fullname": "ggwp"
+  "username": "ardi",
+  "password": "ardi",
+  "fullname": "ardi"
 }
 
 ###
 
-GET http://localhost:5000/users/user-QUxuo-xZrAyYqsyF HTTP/1.1
+POST http://localhost:5000/authentications HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "ardi",
+  "password": "ardi"
+}
+
+###
+
+POST http://localhost:5000/notes HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMW4yaXhYLV9BN1lSMm16RyIsImlhdCI6MTY0NzY3OTY5MX0.40jYtNBh32QGW7Ea2tU87kB_-0Hgp6yO8EQI7OYIds4
+Content-Type: application/json
+
+{
+  "title": "ggwp",
+  "body": "ggwp",
+  "tags": ["ggwp"]
+}
+
+###
+
+POST http://localhost:5000/collaborations HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMW4yaXhYLV9BN1lSMm16RyIsImlhdCI6MTY0NzY3OTY5MX0.40jYtNBh32QGW7Ea2tU87kB_-0Hgp6yO8EQI7OYIds4
+Content-Type: application/json
+
+{
+  "noteId": "pnqH1lit-2CeALBv",
+  "userId": "user-4NZeMRLcb-zu2D0l"
+}
 
 ###
 
 GET http://localhost:5000/notes HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItRkRjX0UxWTA5Z0dPc2RJcCIsImlhdCI6MTY0NzYxOTQxMn0.yoAwclhx2uMkVAJpmGNRKIpYoV1Z1b5DbJy-s24gbts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItNE5aZU1STGNiLXp1MkQwbCIsImlhdCI6MTY0NzY4MDcwMn0.NrsE5pXUnDrIQi9Q99ldAX9wZkGB2DFdo7HXc4g3Vvw

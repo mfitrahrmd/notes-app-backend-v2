@@ -1,0 +1,57 @@
+const { nanoid } = require('nanoid');
+const { Pool } = require('pg');
+const InvariantError = require('../../exeptions/InvariantError');
+
+class CollaborationsService {
+  constructor(usersService) {
+    this._pool = new Pool();
+    this._usersService = usersService;
+  }
+
+  async addCollaboration(noteId, userId) {
+    await this._usersService.getUserById(userId);
+
+    const id = `collab-${nanoid(16)}`;
+
+    const query = {
+      text: 'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
+      values: [id, noteId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Kolaborasi gagal ditambahkan');
+    }
+
+    return result.rows[0].id;
+  }
+
+  async deleteCollaboration(noteId, userId) {
+    const query = {
+      text: 'DELETE FROM collaborations WHERE note_id = $1 AND user_id = $2 RETURNING id',
+      values: [noteId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Kolaborasi gagal dihapus');
+    }
+  }
+
+  async verifyCollaborator(noteId, userId) {
+    const query = {
+      text: 'SELECT * FROM collaborations WHERE note_id = $1 AND user_id = $2',
+      values: [noteId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Kolaborasi gagal diverivikasi');
+    }
+  }
+}
+
+module.exports = CollaborationsService;

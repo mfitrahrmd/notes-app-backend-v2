@@ -5,8 +5,9 @@ const NotFoundError = require('../../exeptions/NotFoundError');
 const AuthorizationError = require('../../exeptions/AuthorizationError');
 
 class NotesService {
-  constructor() {
+  constructor(collaborationsService) {
     this._pool = new Pool();
+    this._collaborationsService = collaborationsService;
   }
 
   async addNote({ title, body, tags, credentialId: owner }) {
@@ -30,7 +31,7 @@ class NotesService {
 
   async getNotes(owner) {
     const query = {
-      text: 'SELECT id, title, body, tags, created_at AS "createdAt", updated_at AS "updatedAt", owner FROM notes WHERE owner = $1',
+      text: 'SELECT notes.id, notes.title, notes.body, notes.tags, notes.created_at AS "createdAt", notes.updated_at AS "updatedAt", notes.owner FROM notes LEFT JOIN collaborations ON collaborations.note_id = notes.id WHERE notes.owner = $1 OR collaborations.user_id = $1 GROUP BY notes.id',
       values: [owner],
     };
 
@@ -41,7 +42,7 @@ class NotesService {
 
   async getNoteById(id) {
     const query = {
-      text: 'SELECT id, title, body, tags, created_at AS "createdAt", updated_at AS "updatedAt" FROM notes WHERE id = $1',
+      text: 'SELECT notes.id, notes.title, notes.body, notes.tags, notes.created_at AS "createdAt", notes.updated_at AS "updatedAt", users.username FROM notes LEFT JOIN users ON users.id = notes.owner WHERE notes.id = $1',
       values: [id],
     };
 
@@ -98,6 +99,21 @@ class NotesService {
 
     if (note.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifyNoteAccess(noteId, userId) {
+    try {
+      await this.verifyNoteOwner(noteId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      try {
+        await this._collaborationsService.verifyCollaborator(noteId, userId);
+      } catch {
+        throw error;
+      }
     }
   }
 }

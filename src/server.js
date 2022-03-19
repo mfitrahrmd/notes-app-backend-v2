@@ -1,22 +1,30 @@
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+
 // Notes Service Plugin
 const notes = require('./api/notes');
 const NotesService = require('./services/postgres/NotesService');
+
 // Users Service Plugin
 const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
+
 // Authentications Service Plugin
 const authentications = require('./api/authentications');
 const AuthenticationsService = require('./services/postgres/AuthenticationsService');
 const TokenManager = require('./tokenize/TokenManager');
 
+// Collaborations Service Plugin
+const collaborations = require('./api/collaborations');
+const CollaborationsService = require('./services/postgres/CollaborationsService');
+
 const errorHandler = require('./serverExtensions/errorHandler');
 require('dotenv').config();
 
 const init = async () => {
-  const notesService = new NotesService();
   const usersService = new UsersService();
+  const collaborationsService = new CollaborationsService(usersService);
+  const notesService = new NotesService(collaborationsService);
   const authenticationsService = new AuthenticationsService();
 
   const server = Hapi.server({
@@ -70,6 +78,13 @@ const init = async () => {
         authenticationsService,
         usersService,
         tokenManager: TokenManager,
+      },
+    },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        notesService,
       },
     },
   ]);
