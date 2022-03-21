@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 const routes = require('./routes');
 const CollaborationsHandler = require('./handler');
 
