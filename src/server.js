@@ -28,13 +28,17 @@ const ProducerService = require('./services/rabbitmq/ProducerService');
 const uploads = require('./api/uploads');
 const StorageService = require('./services/storage/StorageService');
 
+// Redis Cache Service
+const CacheService = require('./services/redis/CacheService');
+
 const errorHandler = require('./serverExtensions/errorHandler');
 require('dotenv').config();
 
 const init = async () => {
   const usersService = new UsersService();
-  const collaborationsService = new CollaborationsService(usersService);
-  const notesService = new NotesService(collaborationsService);
+  const cacheService = new CacheService();
+  const collaborationsService = new CollaborationsService(usersService, cacheService);
+  const notesService = new NotesService(collaborationsService, cacheService);
   const authenticationsService = new AuthenticationsService();
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
 
@@ -58,12 +62,12 @@ const init = async () => {
   ]);
 
   server.auth.strategy('notesapp_jwt', 'jwt', {
-    keys: process.env.JWT_ACCESS_TOKEN_KEY,
+    keys: process.env.ACCESS_TOKEN_KEY,
     verify: {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.JWT_ACCESS_TOKEN_AGE,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
     },
     validate: (artifacts) => ({
       isValid: true,
